@@ -17,6 +17,7 @@ const common_1 = require("@nestjs/common");
 const course_service_1 = require("./course.service");
 const platform_express_1 = require("@nestjs/platform-express");
 const course_review_dto_1 = require("../dto/request/course/course.review.dto");
+const course_note_request_dto_1 = require("../dto/request/course/course-note.request.dto");
 let CoursesController = class CoursesController {
     courseService;
     constructor(courseService) {
@@ -61,6 +62,18 @@ let CoursesController = class CoursesController {
     reviewCourse(reviewInfor) {
         const { courseId, userId, rating, comment } = { ...reviewInfor };
         return this.courseService.addReview(userId, courseId, rating, comment);
+    }
+    createNote(body) {
+        const { userId, courseId, noteData, noteId } = body;
+        return this.courseService.createNote(userId, courseId, noteData, noteId);
+    }
+    markLectureCompleted(lessionId) {
+        console.log('lessionId::', lessionId);
+        return this.courseService.markLectureCompleted(lessionId);
+    }
+    searchCourses(query) {
+        console.log(query);
+        return this.courseService.searchCourses(query);
     }
 };
 exports.CoursesController = CoursesController;
@@ -148,6 +161,30 @@ __decorate([
     __metadata("design:paramtypes", [course_review_dto_1.CourseReview]),
     __metadata("design:returntype", void 0)
 ], CoursesController.prototype, "reviewCourse", null);
+__decorate([
+    (0, common_1.Post)('create-note'),
+    (0, common_1.HttpCode)(201),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [course_note_request_dto_1.CreateNoteDto]),
+    __metadata("design:returntype", void 0)
+], CoursesController.prototype, "createNote", null);
+__decorate([
+    (0, common_1.Patch)('mark-done-lecture'),
+    (0, common_1.HttpCode)(200),
+    __param(0, (0, common_1.Body)('lessionId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", void 0)
+], CoursesController.prototype, "markLectureCompleted", null);
+__decorate([
+    (0, common_1.Get)('search-courses'),
+    (0, common_1.HttpCode)(200),
+    __param(0, (0, common_1.Query)('query')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", void 0)
+], CoursesController.prototype, "searchCourses", null);
 exports.CoursesController = CoursesController = __decorate([
     (0, common_1.Controller)(),
     __metadata("design:paramtypes", [course_service_1.CourseService])

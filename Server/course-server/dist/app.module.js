@@ -21,6 +21,8 @@ const minio_module_1 = require("./minio/minio.module");
 const elasticsearch_module_1 = require("./elasticsearch/elasticsearch.module");
 const config_1 = require("@nestjs/config");
 const payment_module_1 = require("./payment/payment.module");
+const admin_module_1 = require("./admin/admin.module");
+const user_module_1 = require("./user/user.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -29,6 +31,7 @@ exports.AppModule = AppModule = __decorate([
         imports: [
             auth_module_1.AuthModule,
             otp_module_1.OTPModule,
+            user_module_1.UserModule,
             db_module_1.DbModule,
             jwt_module_1.JwtModule,
             redis_module_1.RedisModule,
@@ -41,6 +44,7 @@ exports.AppModule = AppModule = __decorate([
                 envFilePath: '.env',
             }),
             payment_module_1.PaymentModule,
+            admin_module_1.AdminModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],

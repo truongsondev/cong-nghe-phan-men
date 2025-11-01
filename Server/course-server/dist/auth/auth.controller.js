@@ -41,6 +41,9 @@ let AuthController = class AuthController {
     getSignature() {
         return this.authService.getSignature();
     }
+    getRole(userId) {
+        return this.authService.getRole(userId);
+    }
 };
 exports.AuthController = AuthController;
 __decorate([
@@ -85,6 +88,14 @@ __decorate([
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", void 0)
 ], AuthController.prototype, "getSignature", null);
+__decorate([
+    (0, common_1.Post)('check-role'),
+    (0, common_1.HttpCode)(200),
+    __param(0, (0, common_1.Body)('userId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", void 0)
+], AuthController.prototype, "getRole", null);
 exports.AuthController = AuthController = __decorate([
     (0, common_1.Controller)('auth'),
     __metadata("design:paramtypes", [auth_service_1.AuthService])

@@ -39,16 +39,14 @@ let CourseService = class CourseService {
         });
         if (!courseInElas || courseInElas.length <= 0) {
             const courseInDb = await this.prisma.course.findMany();
-            console.log(courseInDb);
             if (courseInDb) {
-                this.indexCourse(courseInDb);
+                courseInDb.forEach((course) => {
+                    this.indexCourse(course);
+                });
             }
             return courseInDb;
         }
-        return {
-            success: false,
-            data: null,
-        };
+        return courseInElas;
     }
     async getAllCourses(limit) {
         try {
@@ -615,55 +613,36 @@ let CourseService = class CourseService {
             throw new Error(error.message || 'Failed to update progress!');
         }
     }
-    async createNote({ userId, courseId, note }) {
+    async createNote(userId, courseId, note, noteId) {
         if (!userId || !courseId || !note?.trim()) {
-            return { success: false, message: 'Missing userId, courseId or note.' };
+            throw new common_1.HttpException('Invalid input data', 400);
+        }
+        const noteAvilable = await this.prisma.courseNote.findFirst({
+            where: {
+                id: noteId,
+            },
+        });
+        if (noteAvilable) {
+            const updatedNote = await this.prisma.courseNote.update({
+                where: { id: noteId },
+                data: { note: note.trim() },
+            });
+            return updatedNote;
         }
         const cleanNote = note.trim();
-        if (cleanNote.length < 3) {
-            return {
-                success: false,
-                message: 'Note is too short. Please write at least 3 characters.',
-            };
-        }
-        if (cleanNote.length > 1000) {
-            return {
-                success: false,
-                message: 'Note is too long. Max length: 1000 characters.',
-            };
-        }
         const [user, course] = await Promise.all([
             this.prisma.user.findUnique({ where: { id: userId } }),
             this.prisma.course.findUnique({ where: { id: courseId } }),
         ]);
         if (!user)
-            return { success: false, message: 'User not found.' };
+            throw new common_1.HttpException('User not found.', 404);
         if (!course)
-            return { success: false, message: 'Course not found.' };
-        if (course.status === 'draft') {
-            return {
-                success: false,
-                message: 'This course is not yet published, you cannot add notes.',
-            };
-        }
+            throw new common_1.HttpException('Course not found.', 404);
         const enrollment = await this.prisma.enrollment.findFirst({
             where: { userId, courseId },
         });
         if (!enrollment) {
-            return {
-                success: false,
-                message: 'You are not enrolled in this course.',
-            };
-        }
-        const duplicate = await this.prisma.courseNote.findFirst({
-            where: {
-                userId,
-                courseId,
-                note: cleanNote,
-            },
-        });
-        if (duplicate) {
-            return { success: false, message: 'You already added a similar note.' };
+            throw new common_1.HttpException('User have not yet registed for this course', 400);
         }
         const newNote = await this.prisma.courseNote.create({
             data: {
@@ -672,21 +651,7 @@ let CourseService = class CourseService {
                 note: cleanNote,
             },
         });
-        await this.prisma
-            .$executeRawUnsafe(`
-    INSERT INTO note_audit_logs (user_id, course_id, action, created_at)
-    VALUES ('${userId}', '${courseId}', 'create_note', NOW())
-  `)
-            .catch(() => { });
-        return {
-            success: true,
-            message: 'Note created successfully.',
-            data: {
-                ...newNote,
-                user: { id: user.id, full_name: user.full_name },
-                course: { id: course.id, title: course.title },
-            },
-        };
+        return newNote;
     }
     async getCourseStatistics() {
         try {
@@ -826,6 +791,17 @@ let CourseService = class CourseService {
             progress: `${percentage.toFixed(2)}%`,
             lastLesson: lesson.title,
         };
+    }
+    async markLectureCompleted(idLecture) {
+        console.log(idLecture);
+        const lesson = await this.prisma.lesson.update({
+            where: { id: idLecture },
+            data: { lessionStatus: true },
+        });
+        if (!lesson) {
+            throw new common_1.HttpException('Lesson not found', 404);
+        }
+        return lesson;
     }
 };
 exports.CourseService = CourseService;

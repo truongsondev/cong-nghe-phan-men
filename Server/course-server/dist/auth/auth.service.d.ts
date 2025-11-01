@@ -37,4 +37,5 @@ export declare class AuthService {
         expire: number;
         signature: string;
     };
+    getRole(userId: string | undefined): Promise<import("generated/prisma").$Enums.Role>;
 }

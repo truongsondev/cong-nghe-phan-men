@@ -9,9 +9,9 @@ export declare class PaymentService {
     createOrderId(courseId: string, userId: string): Promise<{
         id: string;
         userId: string;
+        status: string;
         courseId: string;
         enrolledAt: Date;
-        status: string;
     }>;
     confirmEnrollment(orderId: string): Promise<{
         orderId: string;

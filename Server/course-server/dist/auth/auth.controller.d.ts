@@ -31,4 +31,5 @@ export declare class AuthController {
         expire: number;
         signature: string;
     };
+    getRole(userId: string): Promise<import("generated/prisma").$Enums.Role>;
 }

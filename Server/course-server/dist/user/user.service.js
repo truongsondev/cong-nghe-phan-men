@@ -63,6 +63,101 @@ let UserService = class UserService {
             throw new common_1.HttpException('Internal server error.', 500);
         }
     };
+    async getUserProfile(userId) {
+        const user = await this.prisma.user.findUnique({
+            where: { id: userId },
+            include: {
+                courses: {
+                    include: {
+                        category: { select: { name: true } },
+                        reviews: true,
+                        enrollments: true,
+                    },
+                },
+                enrollments: {
+                    include: {
+                        course: {
+                            select: {
+                                id: true,
+                                title: true,
+                                price: true,
+                                status: true,
+                                category: { select: { name: true } },
+                                instructor: { select: { full_name: true } },
+                            },
+                        },
+                    },
+                },
+                reviews: true,
+                courseProgress: {
+                    include: {
+                        course: { select: { id: true, title: true } },
+                        lastLesson: { select: { id: true, title: true, position: true } },
+                    },
+                },
+            },
+        });
+        if (!user)
+            throw new common_1.HttpException('User không tồn tại', 404);
+        return {
+            id: user.id,
+            fullName: user.full_name,
+            email: user.email,
+            role: user.role,
+            bio: user.bio,
+            createdAt: user.createdAt,
+            courses: user.courses.map((c) => ({
+                id: c.id,
+                title: c.title,
+                category: c.category?.name,
+                price: c.price,
+                status: c.status,
+                studentsCount: c.enrollments.length,
+                rating: c.reviews.length > 0
+                    ? c.reviews.reduce((acc, r) => acc + r.rating, 0) / c.reviews.length
+                    : null,
+            })),
+            enrolledCourses: user.enrollments.map((e) => ({
+                id: e.course.id,
+                title: e.course.title,
+                instructor: e.course.instructor?.full_name,
+                price: e.course.price,
+                category: e.course.category?.name,
+                status: e.course.status,
+            })),
+            progress: user.courseProgress.map((p) => ({
+                courseId: p.courseId,
+                courseTitle: p.course.title,
+                progressPercentage: p.progressPercentage,
+                lastLesson: p.lastLesson
+                    ? {
+                        id: p.lastLesson.id,
+                        title: p.lastLesson.title,
+                        position: p.lastLesson.position,
+                    }
+                    : null,
+            })),
+        };
+    }
+    async updateUserProfile(userId, data) {
+        const { fullName, bio } = data;
+        return await this.prisma.user.update({
+            where: { id: userId },
+            data: {
+                ...(fullName && { full_name: fullName }),
+                ...(bio && { bio }),
+            },
+            select: {
+                id: true,
+                email: true,
+                full_name: true,
+                bio: true,
+                role: true,
+                user_verified: true,
+                createdAt: true,
+            },
+        });
+    }
 };
 exports.UserService = UserService;
 exports.UserService = UserService = __decorate([

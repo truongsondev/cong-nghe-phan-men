@@ -222,6 +222,20 @@ let AuthService = class AuthService {
         const signature = imagekit.getAuthenticationParameters();
         return signature;
     }
+    async getRole(userId) {
+        if (!userId)
+            throw new common_1.BadRequestException('userId is required');
+        try {
+            const { role } = await this.prisma.user.findUniqueOrThrow({
+                where: { id: userId },
+                select: { role: true },
+            });
+            return role;
+        }
+        catch (e) {
+            throw new common_1.NotFoundException('User not found');
+        }
+    }
 };
 exports.AuthService = AuthService;
 exports.AuthService = AuthService = __decorate([

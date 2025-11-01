@@ -53,4 +53,10 @@ export class AuthController {
   getSignature() {
     return this.authService.getSignature();
   }
+
+  @Post('check-role')
+  @HttpCode(200)
+  getRole(@Body('userId') userId: string) {
+    return this.authService.getRole(userId);
+  }
 }

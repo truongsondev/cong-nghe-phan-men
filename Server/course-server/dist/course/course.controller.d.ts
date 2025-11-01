@@ -1,5 +1,6 @@
 import { CourseService } from './course.service';
 import { CourseReview } from 'src/dto/request/course/course.review.dto';
+import { CreateNoteDto } from 'src/dto/request/course/course-note.request.dto';
 export declare class CoursesController {
     private readonly courseService;
     constructor(courseService: CourseService);
@@ -60,9 +61,9 @@ export declare class CoursesController {
     } & {
         id: string;
         createdAt: Date;
+        userId: string;
         updatedAt: Date;
         courseId: string;
-        userId: string;
         rating: number;
         comment: string | null;
     })[]>;
@@ -128,11 +129,31 @@ export declare class CoursesController {
         data: {
             id: string;
             createdAt: Date;
+            userId: string;
             updatedAt: Date;
             courseId: string;
-            userId: string;
             rating: number;
             comment: string | null;
         };
     }>;
+    createNote(body: CreateNoteDto): Promise<{
+        id: string;
+        createdAt: Date;
+        userId: string;
+        courseId: string;
+        note: string;
+    }>;
+    markLectureCompleted(lessionId: string): Promise<{
+        id: string;
+        createdAt: Date;
+        title: string;
+        videoUrl: string | null;
+        updatedAt: Date;
+        sessionId: string;
+        docUrl: string | null;
+        position: number;
+        lessionStatus: boolean;
+        duration: number | null;
+    }>;
+    searchCourses(query: string): Promise<unknown[]>;
 }

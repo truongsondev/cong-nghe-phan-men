@@ -8,22 +8,7 @@ export declare class CourseService {
     private readonly elastic;
     constructor(prisma: PrismaClient, minioService: MinioService, elastic: ElasticService);
     indexCourse(course: any): Promise<void>;
-    searchCourses(keyword: string): Promise<{
-        id: string;
-        title: string;
-        description: string;
-        instructorId: string;
-        thumbnailUrl: string;
-        videoUrl: string;
-        status: string;
-        categoryId: string | null;
-        price: number;
-        createdAt: Date;
-        updatedAt: Date;
-    }[] | {
-        success: boolean;
-        data: null;
-    }>;
+    searchCourses(keyword: string): Promise<unknown[]>;
     getAllCourses(limit: number): Promise<any[]>;
     getReview(courseId: string): Promise<({
         user: {
@@ -32,8 +17,8 @@ export declare class CourseService {
     } & {
         id: string;
         createdAt: Date;
-        updatedAt: Date;
         userId: string;
+        updatedAt: Date;
         courseId: string;
         rating: number;
         comment: string | null;
@@ -149,9 +134,9 @@ export declare class CourseService {
         sessions: ({
             lessons: {
                 id: string;
+                createdAt: Date;
                 title: string;
                 videoUrl: string | null;
-                createdAt: Date;
                 updatedAt: Date;
                 sessionId: string;
                 docUrl: string | null;
@@ -161,14 +146,15 @@ export declare class CourseService {
             }[];
         } & {
             id: string;
-            title: string;
             createdAt: Date;
+            title: string;
             courseId: string;
             position: number;
             expiresAt: Date;
         })[];
     } & {
         id: string;
+        createdAt: Date;
         title: string;
         description: string;
         instructorId: string;
@@ -177,7 +163,6 @@ export declare class CourseService {
         status: string;
         categoryId: string | null;
         price: number;
-        createdAt: Date;
         updatedAt: Date;
     }>;
     editCourse(meta: any, files: any): Promise<any>;
@@ -186,8 +171,8 @@ export declare class CourseService {
         data: {
             id: string;
             createdAt: Date;
-            updatedAt: Date;
             userId: string;
+            updatedAt: Date;
             courseId: string;
             rating: number;
             comment: string | null;
@@ -200,39 +185,19 @@ export declare class CourseService {
         message: string;
         progress: {
             id: string;
-            updatedAt: Date;
             userId: string;
+            updatedAt: Date;
             courseId: string;
             lastLessonId: string | null;
             progressPercentage: import("generated/prisma/runtime/library").Decimal;
         };
     }>;
-    createNote({ userId, courseId, note }: {
-        userId: any;
-        courseId: any;
-        note: any;
-    }): Promise<{
-        success: boolean;
-        message: string;
-        data?: undefined;
-    } | {
-        success: boolean;
-        message: string;
-        data: {
-            user: {
-                id: string;
-                full_name: string | null;
-            };
-            course: {
-                id: string;
-                title: string;
-            };
-            id: string;
-            createdAt: Date;
-            userId: string;
-            courseId: string;
-            note: string;
-        };
+    createNote(userId: any, courseId: any, note: any, noteId: any): Promise<{
+        id: string;
+        createdAt: Date;
+        userId: string;
+        courseId: string;
+        note: string;
     }>;
     getCourseStatistics(): Promise<{
         message: string;
@@ -258,5 +223,17 @@ export declare class CourseService {
         message: string;
         progress: string;
         lastLesson: string;
+    }>;
+    markLectureCompleted(idLecture: string): Promise<{
+        id: string;
+        createdAt: Date;
+        title: string;
+        videoUrl: string | null;
+        updatedAt: Date;
+        sessionId: string;
+        docUrl: string | null;
+        position: number;
+        lessionStatus: boolean;
+        duration: number | null;
     }>;
 }
